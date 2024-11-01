@@ -1001,8 +1001,11 @@ static void GL_CheckExtensions (void)
 	//
 	if (COM_CheckParm("-novbo"))
 		Con_Warning ("Vertex buffer objects disabled at command line\n");
+#ifndef __MORPHOS__
+	// OpenGL version 1.2 with MorphOS but have some capacities of 2.1
 	else if (gl_version_major < 1 || (gl_version_major == 1 && gl_version_minor < 5))
 		Con_Warning ("OpenGL version < 1.5, skipping ARB_vertex_buffer_object check\n");
+#endif
 	else
 	{
 		GL_BindBufferFunc = (PFNGLBINDBUFFERARBPROC) SDL_GL_GetProcAddress("glBindBufferARB");
@@ -1183,7 +1186,12 @@ static void GL_CheckExtensions (void)
 	//
 	if (COM_CheckParm("-noglsl"))
 		Con_Warning ("GLSL disabled at command line\n");
+#ifdef __MORPHOS__	
+	else if (gl_version_major >= 1)
+	// YES new tinygl support shaders 
+#else
 	else if (gl_version_major >= 2)
+#endif
 	{
 		GL_CreateShaderFunc = (QS_PFNGLCREATESHADERPROC) SDL_GL_GetProcAddress("glCreateShader");
 		GL_DeleteShaderFunc = (QS_PFNGLDELETESHADERPROC) SDL_GL_GetProcAddress("glDeleteShader");
@@ -1623,7 +1631,9 @@ VID_Init
 */
 void	VID_Init (void)
 {
+#ifndef __MORPHOS__	
 	static char vid_center[] = "SDL_VIDEO_CENTERED=center";
+#endif
 	int		p, width, height, refreshrate, bpp;
 	int		display_width, display_height, display_refreshrate, display_bpp;
 	qboolean	fullscreen;
@@ -1662,9 +1672,9 @@ void	VID_Init (void)
 	Cmd_AddCommand ("vid_test", VID_Test); //johnfitz
 	Cmd_AddCommand ("vid_describecurrentmode", VID_DescribeCurrentMode_f);
 	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
-
+#ifndef __MORPHOS__
 	putenv (vid_center);	/* SDL_putenv is problematic in versions <= 1.2.9 */
-
+#endif
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 		Sys_Error("Couldn't init SDL video: %s", SDL_GetError());
 

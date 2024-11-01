@@ -118,6 +118,9 @@ typedef unsigned int	in_addr_t;	/* u_int32_t */
 
 #define	SOCKETERRNO	Errno()
 #define	ioctlsocket	IoctlSocket
+#ifdef __MORPHOS__
+#define ioctl IoctlSocket
+#endif
 #define	closesocket	CloseSocket
 #define	selectsocket(_N,_R,_W,_E,_T)		\
 	WaitSelect((_N),(_R),(_W),(_E),(_T),NULL)
